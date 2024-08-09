@@ -1,5 +1,3 @@
-# torch
-# torchvision
-hydra-core
-wandb
-omegaconf
+hydra-core==1.3.2
+wandb==0.17.6
+omegaconf==2.3.0
