@@ -1,5 +1,7 @@
 #!/bin/bash
 
-mkdir -p /app/logs
+# Run the training script
+python train.py
 
-stdbuf -oL -eL python -u train.py 2>&1 | tee -a /app/logs/output.log
+# Cat the log file
+cat /app/logs/training_log.txt

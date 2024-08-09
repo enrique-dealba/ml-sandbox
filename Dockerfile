@@ -30,5 +30,8 @@ EXPOSE 8888
 # Ensure log directory exists
 RUN mkdir -p /app/logs
 
-# Run the Python script
-CMD ["python", "-u", "train.py"]
+# Make the run script executable
+RUN chmod +x /app/run.sh
+
+# Run the script
+CMD ["/app/run.sh"]
