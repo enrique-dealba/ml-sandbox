@@ -55,6 +55,8 @@ def train(cfg: DictConfig):
     wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
     log_message(f"Full Wandb config: {wandb_config}", color="cyan")
 
+    wandb.init(project="mnist-sandbox", config=wandb_config)
+
     device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
     log_message(f"Using device: {device}", color="yellow")
 
