@@ -7,6 +7,7 @@ import wandb
 from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
 import os
+import logging
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def train(cfg: DictConfig):
@@ -112,7 +113,9 @@ def train(cfg: DictConfig):
     test_accuracy = 100. * correct / len(test_loader.dataset)
     wandb.log({"test_loss": test_loss, "test_accuracy": test_accuracy})
     
-    print(f'Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%')
+    logging.info(f'Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%')
+    logging.info(f'wandb Run ID: {wandb.run.id}')
+    logging.info(f'wandb Run Name: {wandb.run.name}')
 
 if __name__ == "__main__":
     train()
