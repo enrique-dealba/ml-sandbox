@@ -1,19 +1,20 @@
 import torch
 from torchvision import datasets, transforms
 
-def get_mnist_subset(subset_size):
+def get_data_loaders(cfg):
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+    
     full_dataset = datasets.MNIST('data', train=True, download=True, transform=transform)
-    subset_indices = torch.randperm(len(full_dataset))[:subset_size]
-    subset = torch.utils.data.Subset(full_dataset, subset_indices)
-    return subset
-
-def get_data_loaders(config):
-    train_dataset = get_mnist_subset(config.data.subset_size)
-    test_dataset = datasets.MNIST('data', train=False, download=True, 
-                                  transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]))
     
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.data.batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=config.data.batch_size, shuffle=False)
+    # Use the configured split ratio
+    train_size = int(cfg.data.train_val_split * len(full_dataset))
+    val_size = len(full_dataset) - train_size
+    train_dataset, val_dataset = torch.utils.data.random_split(full_dataset, [train_size, val_size])
     
-    return train_loader, test_loader
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.data.batch_size, shuffle=True)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=cfg.data.batch_size, shuffle=False)
+    
+    test_dataset = datasets.MNIST('data', train=False, download=True, transform=transform)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg.data.batch_size, shuffle=False)
+    
+    return train_loader, val_loader, test_loader

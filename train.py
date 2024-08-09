@@ -1,9 +1,7 @@
-import logging
 import sys
-import os
 import time
-import click
 
+import click
 import hydra
 import torch
 import torch.nn as nn
@@ -18,35 +16,47 @@ from utils.data_loader import get_data_loaders
 class Tee(object):
     def __init__(self, *files):
         self.files = files
+
     def write(self, obj):
         for f in self.files:
             f.write(obj)
             f.flush()
+
     def flush(self):
         for f in self.files:
             f.flush()
 
+
 # Redirect stdout and stderr
-log_file = open('/app/logs/output.log', 'w')
+log_file = open("/app/logs/output.log", "w")
 sys.stdout = Tee(sys.stdout, log_file)
 sys.stderr = Tee(sys.stderr, log_file)
 
+
 def log_message(message, color=None):
-    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     if color:
         message = click.style(message, fg=color)
     print(f"{timestamp} - {message}")
 
+
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def train(cfg: DictConfig):
-    log_message("Training started", color='green')
+    log_message("Training started", color="green")
+
+    # Log configuration information
+    log_message("Configuration:", color="blue")
+    log_message(f"Learning rate: {cfg.training.learning_rate}")
+    log_message(f"Number of epochs: {cfg.training.epochs}")
+    log_message(f"Batch size: {cfg.data.batch_size}")
+    log_message(f"Model type: {cfg.model.type}")
+    log_message(f"Device: {cfg.training.device}")
 
     wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
-    # log_message(f"Wandb config: {wandb_config}")
-
-    run = wandb.init(project="mnist-sandbox", config=wandb_config)
+    log_message(f"Full Wandb config: {wandb_config}", color="cyan")
 
     device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
+    log_message(f"Using device: {device}", color="yellow")
 
     train_loader, val_loader, test_loader = get_data_loaders(cfg)
 
@@ -58,8 +68,10 @@ def train(cfg: DictConfig):
         else:
             raise ValueError(f"Unknown model type: {cfg.model.type}")
     except AttributeError as e:
-        print(f"Configuration error: {e}")
-        print("Check your config files for missing or incorrect parameters.")
+        log_message(f"Configuration error: {e}", color="red")
+        log_message(
+            "Check your config files for missing or incorrect parameters.", color="red"
+        )
         return
 
     criterion = nn.CrossEntropyLoss()
@@ -80,6 +92,10 @@ def train(cfg: DictConfig):
             optimizer.step()
 
             if batch_idx % 100 == 0:
+                log_message(
+                    f"Epoch {epoch}, Batch {batch_idx}, Loss: {loss.item():.4f}",
+                    color="magenta",
+                )
                 wandb.log({"train_loss": loss.item(), "epoch": epoch})
 
         model.eval()
@@ -97,8 +113,9 @@ def train(cfg: DictConfig):
         val_accuracy = 100.0 * correct / len(val_loader.dataset)
         wandb.log({"val_loss": val_loss, "val_accuracy": val_accuracy, "epoch": epoch})
 
-        print(
-            f"Epoch {epoch}: Val loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}%"
+        log_message(
+            f"Epoch {epoch}: Val loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}%",
+            color="cyan",
         )
 
         # Save the best model
@@ -120,17 +137,19 @@ def train(cfg: DictConfig):
             )
 
             # Log model as artifact
-            artifact = wandb.Artifact(f"best_model_run_{run.id}", type="model")
+            artifact = wandb.Artifact(f"best_model_run_{wandb.run.id}", type="model")
             artifact.add_file(model_path)
-            run.log_artifact(artifact)
+            wandb.log_artifact(artifact)
 
-            print(f"Saved best model to {model_path}")
+            log_message(f"Saved best model to {model_path}", color="green")
         else:
             patience_counter += 1
 
         # Early stopping
         if patience_counter >= patience:
-            print(f"Early stopping triggered after {epoch + 1} epochs")
+            log_message(
+                f"Early stopping triggered after {epoch + 1} epochs", color="yellow"
+            )
             break
 
     # Final evaluation on test set
@@ -149,17 +168,14 @@ def train(cfg: DictConfig):
     test_accuracy = 100.0 * correct / len(test_loader.dataset)
     wandb.log({"test_loss": test_loss, "test_accuracy": test_accuracy})
 
-    # logger.info(
-    #     f"Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%"
-    # )
-    # logger.info(f"wandb Run ID: {wandb.run.id}")
-    # logger.info(f"wandb Run Name: {wandb.run.name}")
-    # log_to_file("Training completed")
-    # log_message("Training completed")
-
-    log_message("Training completed", color='green')
+    log_message(
+        f"Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%",
+        color="green",
+    )
+    log_message(f"wandb Run ID: {wandb.run.id}", color="blue")
+    log_message(f"wandb Run Name: {wandb.run.name}", color="blue")
 
 
 if __name__ == "__main__":
-    log_message("Script starting...", color='yellow')
+    log_message("Script starting...", color="green")
     train()
