@@ -1,3 +1,5 @@
+import sys
+
 import hydra
 import torch
 import torch.nn as nn
@@ -7,6 +9,9 @@ from omegaconf import DictConfig, OmegaConf
 
 from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
+
+# Force flushing of Python's output buffer
+sys.stdout.reconfigure(line_buffering=True)
 
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
