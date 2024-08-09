@@ -32,6 +32,7 @@ RUN mkdir -p /app/logs
 
 # Make the run script executable
 RUN chmod +x /app/new_run.sh
+RUN chmod +x /app/run.sh
 
 # Run the script
-ENTRYPOINT ["/app/new_run.sh"]
+ENTRYPOINT ["/app/run.sh"]
