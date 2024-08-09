@@ -140,7 +140,35 @@ def train(cfg: DictConfig):
             color="cyan",
         )
 
-        # ... [Model saving logic remains unchanged] ...
+        # Save the best model and update best_val_accuracy
+        if val_accuracy > best_val_accuracy:
+            best_val_accuracy = val_accuracy
+            patience_counter = 0
+
+            # Save model
+            model_path = f"best_model_epoch{epoch}_acc{val_accuracy:.2f}.pth"
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "val_accuracy": val_accuracy,
+                    "val_loss": val_loss,
+                },
+                model_path,
+            )
+
+            # Log model as artifact
+            artifact = wandb.Artifact(f"best_model_run_{wandb.run.id}", type="model")
+            artifact.add_file(model_path)
+            wandb.log_artifact(artifact)
+
+            log_message(f"Saved best model to {model_path}", color="green")
+            log_message(
+                f"New best validation accuracy: {best_val_accuracy:.2f}%", color="green"
+            )
+        else:
+            patience_counter += 1
 
         # Early stopping
         if patience_counter >= patience:
@@ -150,6 +178,7 @@ def train(cfg: DictConfig):
             break
 
     # Final evaluation on test set
+    log_message("Running Final Evaluation on Test Set...", color="green")
     model.eval()
     test_loss = 0
     test_correct = 0
