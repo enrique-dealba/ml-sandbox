@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import hydra
@@ -10,8 +11,28 @@ from omegaconf import DictConfig, OmegaConf
 from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
 
-# Force flushing of Python's output buffer
-sys.stdout.reconfigure(line_buffering=True)
+
+def setup_logger():
+    logger = logging.getLogger("train_logger")
+    logger.setLevel(logging.INFO)
+
+    # Create handlers
+    c_handler = logging.StreamHandler(sys.stdout)
+    f_handler = logging.FileHandler("training.log")
+
+    # Create formatters and add it to handlers
+    format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    c_handler.setFormatter(format)
+    f_handler.setFormatter(format)
+
+    # Add handlers to the logger
+    logger.addHandler(c_handler)
+    logger.addHandler(f_handler)
+
+    return logger
+
+
+logger = setup_logger()
 
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
@@ -123,13 +144,13 @@ def train(cfg: DictConfig):
     test_accuracy = 100.0 * correct / len(test_loader.dataset)
     wandb.log({"test_loss": test_loss, "test_accuracy": test_accuracy})
 
-    print(
-        f"Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%",
-        flush=True,
+    logger.info(
+        f"Final Test loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%"
     )
-    print(f"wandb Run ID: {wandb.run.id}", flush=True)
-    print(f"wandb Run Name: {wandb.run.name}", flush=True)
+    logger.info(f"wandb Run ID: {wandb.run.id}")
+    logger.info(f"wandb Run Name: {wandb.run.name}")
 
 
 if __name__ == "__main__":
+    logger.info("Training starting...")
     train()

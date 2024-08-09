@@ -25,4 +25,5 @@ COPY . /app
 EXPOSE 8888
 
 # Run train.py when the container launches
-CMD ["python", "train.py"]
+# CMD ["python", "train.py"]
+CMD python train.py | tee output.log
