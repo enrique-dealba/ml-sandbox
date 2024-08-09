@@ -18,13 +18,18 @@ def train(cfg: DictConfig):
     
     train_loader, test_loader = get_data_loaders(cfg)
     
-    if cfg.model.type == "base":
-        model = BaseModel(cfg).to(device)
-    elif cfg.model.type == "experiment":
-        model = ExperimentModel(cfg).to(device)
-    else:
-        raise ValueError(f"Unknown model type: {cfg.model.type}")
-    
+    try:
+        if cfg.model.type == "base":
+            model = BaseModel(cfg).to(device)
+        elif cfg.model.type == "experiment":
+            model = ExperimentModel(cfg).to(device)
+        else:
+            raise ValueError(f"Unknown model type: {cfg.model.type}")
+    except AttributeError as e:
+        print(f"Configuration error: {e}")
+        print("Check your config files for missing or incorrect parameters.")
+        return
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
     

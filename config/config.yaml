@@ -14,3 +14,4 @@ training:
 
 model:
   type: base
+  hidden_size: 128
