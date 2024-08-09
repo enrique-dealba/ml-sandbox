@@ -27,6 +27,11 @@ COPY . /app
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
-# Run train.py when the container launches
-# CMD ["python", "train.py"]
-CMD ["python", "-u", "train.py"]
+# Create an empty log file
+RUN touch /app/output.log
+
+# Use a shell script to run both the Python script and tail
+COPY run.sh /app/run.sh
+RUN chmod +x /app/run.sh
+
+CMD ["/app/run.sh"]
