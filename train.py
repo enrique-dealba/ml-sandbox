@@ -1,5 +1,5 @@
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -7,9 +7,12 @@ import wandb
 from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="config", config_name="config", version_base=None)
 def train(cfg: DictConfig):
-    wandb.init(project="mnist-sandbox", config=cfg)
+    # Convert the Hydra config to a dictionary for wandb
+    wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
+    
+    wandb.init(project="mnist-sandbox", config=wandb_config)
     
     device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
     
