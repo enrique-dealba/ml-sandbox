@@ -15,20 +15,34 @@ from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
 
 
-LOG_FILE = '/app/logs/training_log.txt'
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+            f.flush()
+    def flush(self):
+        for f in self.files:
+            f.flush()
 
-def log_message(message):
+# Redirect stdout and stderr
+log_file = open('/app/logs/output.log', 'w')
+sys.stdout = Tee(sys.stdout, log_file)
+sys.stderr = Tee(sys.stderr, log_file)
+
+def log_message(message, color=None):
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-    with open(LOG_FILE, 'a') as f:
-        f.write(f"{timestamp} - {message}\n")
-
+    if color:
+        message = click.style(message, fg=color)
+    print(f"{timestamp} - {message}")
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
 def train(cfg: DictConfig):
-    log_message("Training started")
+    log_message("Training started", color='green')
 
     wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
-    log_message(f"Wandb config: {wandb_config}")
+    # log_message(f"Wandb config: {wandb_config}")
 
     run = wandb.init(project="mnist-sandbox", config=wandb_config)
 
@@ -141,10 +155,11 @@ def train(cfg: DictConfig):
     # logger.info(f"wandb Run ID: {wandb.run.id}")
     # logger.info(f"wandb Run Name: {wandb.run.name}")
     # log_to_file("Training completed")
-    log_message("Training completed")
+    # log_message("Training completed")
+
+    log_message("Training completed", color='green')
 
 
 if __name__ == "__main__":
-    os.makedirs(os.path.dirname(LOG_FILE), exist_exist=True)
-    log_message("Script starting...")
+    log_message("Script starting...", color='yellow')
     train()

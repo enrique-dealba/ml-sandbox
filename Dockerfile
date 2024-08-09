@@ -34,5 +34,8 @@ RUN mkdir -p /app/logs
 RUN chmod +x /app/new_run.sh
 RUN chmod +x /app/run.sh
 
-# Run the script
-ENTRYPOINT ["/app/new_run.sh"]
+# # Run the script
+# ENTRYPOINT ["/app/new_run.sh"]
+
+# Run the Python script
+CMD ["python", "-u", "train.py"]
