@@ -35,4 +35,4 @@ RUN chmod +x /app/new_run.sh
 RUN chmod +x /app/run.sh
 
 # Run the script
-ENTRYPOINT ["/app/run.sh"]
+ENTRYPOINT ["/app/new_run.sh"]
