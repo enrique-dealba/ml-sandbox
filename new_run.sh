@@ -3,44 +3,53 @@
 # Enable command echoing
 set -x
 
-# Print current directory and its contents
+# Set up logging for the shell script
+SHELL_LOG="/app/logs/shell_log.txt"
+PYTHON_LOG="/app/logs/python_log.txt"
+
+# Redirect all output to both console and shell log file
+exec > >(tee -a "$SHELL_LOG") 2>&1
+
+echo "==============================================="
+echo "Starting run_and_log.sh script"
+echo "==============================================="
+
 echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Check if log directory exists, create if not
 if [ ! -d "/app/logs" ]; then
     echo "Creating log directory"
     mkdir -p /app/logs
 fi
 
-# Define log file path
-LOG_FILE="/app/logs/training_log.txt"
+touch "$PYTHON_LOG"
 
-# Touch the log file to ensure it exists
-touch $LOG_FILE
-
-echo "Starting log tail"
-# Start tailing the log file in the background
-tail -f $LOG_FILE &
+echo "Starting Python log tail"
+tail -f "$PYTHON_LOG" &
 TAIL_PID=$!
 
-echo "Running Python script"
-# Run the training script
-python -u train.py
-PYTHON_EXIT_CODE=$?
+echo "Running Python script with arguments: $@"
+python -u train.py "$@" 2>&1 | tee -a "$PYTHON_LOG"
+PYTHON_EXIT_CODE=${PIPESTATUS[0]}
 
 echo "Python script finished with exit code: $PYTHON_EXIT_CODE"
 
-# Kill the tail process
-echo "Stopping log tail"
+echo "Stopping Python log tail"
 kill $TAIL_PID
 
-# Wait for a moment to ensure all logs are written
 sleep 2
 
-echo "Full log contents:"
-# Cat the full log file
-cat $LOG_FILE
+echo "==============================================="
+echo "Full Python log contents:"
+echo "==============================================="
+cat "$PYTHON_LOG"
 
+echo "==============================================="
+echo "Full shell script log contents:"
+echo "==============================================="
+cat "$SHELL_LOG"
+
+echo "==============================================="
 echo "Script completed"
+echo "==============================================="
