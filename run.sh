@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Start tailing the log file in the background
-tail -f /app/output.log &
+mkdir -p /app/logs
 
-# Run the Python script
-python train.py
-
-# Wait for both processes to finish
-wait
+stdbuf -oL -eL python -u train.py 2>&1 | tee -a /app/logs/output.log
