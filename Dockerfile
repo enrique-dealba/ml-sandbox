@@ -31,7 +31,7 @@ EXPOSE 8888
 RUN mkdir -p /app/logs
 
 # Make the run script executable
-RUN chmod +x /app/run.sh
+RUN chmod +x /app/new_run.sh
 
 # Run the script
 CMD ["/app/new_run.sh"]
