@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 import hydra
 import torch
@@ -12,27 +13,25 @@ from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
 
 
-def setup_logger():
-    logger = logging.getLogger("train_logger")
-    logger.setLevel(logging.INFO)
+# Set up basic logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    # Create handlers
-    c_handler = logging.StreamHandler(sys.stdout)
-    f_handler = logging.FileHandler("training.log")
+# Create a custom logger
+logger = logging.getLogger('custom_logger')
+logger.setLevel(logging.DEBUG)
 
-    # Create formatters and add it to handlers
-    format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    c_handler.setFormatter(format)
-    f_handler.setFormatter(format)
+# Create handlers
+stream_handler = logging.StreamHandler(sys.stdout)
+file_handler = logging.FileHandler('output.log')
 
-    # Add handlers to the logger
-    logger.addHandler(c_handler)
-    logger.addHandler(f_handler)
+# Create formatters and add it to handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stream_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
 
-    return logger
-
-
-logger = setup_logger()
+# Add handlers to the logger
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
 
 
 @hydra.main(config_path="config", config_name="config", version_base=None)
@@ -40,6 +39,8 @@ def train(cfg: DictConfig):
     wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
 
     run = wandb.init(project="mnist-sandbox", config=wandb_config)
+
+    run.log("run.log: Training starting...")
 
     device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
 
@@ -151,6 +152,50 @@ def train(cfg: DictConfig):
     logger.info(f"wandb Run Name: {wandb.run.name}")
 
 
+
 if __name__ == "__main__":
-    logger.info("Training starting...")
+    # 1. Basic print
+    print("1. Basic print: Training starting...")
+    
+    # 2. Print with flush
+    print("2. Print with flush: Training starting...", flush=True)
+    
+    # 3. Sys stdout write
+    sys.stdout.write("3. Sys stdout write: Training starting...\n")
+    sys.stdout.flush()
+    
+    # 4. OS write to file descriptor
+    os.write(1, b"4. OS write: Training starting...\n")
+    
+    # 5. Basic logging
+    logging.debug("5. Logging debug: Training starting...")
+    logging.info("5. Logging info: Training starting...")
+    logging.warning("5. Logging warning: Training starting...")
+    
+    # 6. Custom logger
+    logger.debug("6. Custom logger debug: Training starting...")
+    logger.info("6. Custom logger info: Training starting...")
+    logger.warning("6. Custom logger warning: Training starting...")
+    
+    # 7. Wandb log
+    wandb.init(project="mnist-sandbox")
+    wandb.log({"message": "7. Wandb log: Training starting..."})
+    
+    # 8. Tqdm for progress bar
+    from tqdm import tqdm
+    for _ in tqdm(range(1), desc="8. Tqdm progress"):
+        pass
+
+    # 9. Rich library for fancy console output
+    from rich import print as rprint
+    rprint("[bold green]9. Rich print:[/bold green] Training starting...")
+    
+    # 10. Pyfiglet for ASCII art
+    from pyfiglet import figlet_format
+    print(figlet_format("10. Training", font="slant"))
+    
+    # Finally, run the train function
     train()
+
+    # 11. End message
+    print("Training completed!")

@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip uninstall torch -y
 RUN pip install --no-cache-dir torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
 
+# Install additional packages for logging experiments
+RUN pip install --no-cache-dir tqdm rich pyfiglet
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
@@ -26,4 +29,4 @@ EXPOSE 8888
 
 # Run train.py when the container launches
 # CMD ["python", "train.py"]
-CMD python train.py | tee output.log
+CMD ["python", "-u", "train.py"]
