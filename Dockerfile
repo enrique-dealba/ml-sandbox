@@ -19,7 +19,7 @@ RUN pip uninstall torch -y
 RUN pip install --no-cache-dir torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
 
 # Install additional packages for logging experiments
-RUN pip install --no-cache-dir tqdm rich pyfiglet
+RUN pip install --no-cache-dir tqdm rich pyfiglet click
 
 # Copy the current directory contents into the container at /app
 COPY . /app
@@ -27,11 +27,8 @@ COPY . /app
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
-# Create an empty log file
-RUN touch /app/output.log
+# Ensure log directory exists
+RUN mkdir -p /app/logs
 
-# Use a shell script to run both the Python script and tail
-COPY run.sh /app/run.sh
-RUN chmod +x /app/run.sh
-
-CMD ["/app/run.sh"]
+# Run the Python script
+CMD ["python", "-u", "train.py"]
