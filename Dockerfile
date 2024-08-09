@@ -34,4 +34,4 @@ RUN mkdir -p /app/logs
 RUN chmod +x /app/run.sh
 
 # Run the script
-CMD ["/app/run.sh"]
+CMD ["/app/new_run.sh"]
