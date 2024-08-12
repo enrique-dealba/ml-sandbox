@@ -18,9 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip uninstall torch -y
 RUN pip install --no-cache-dir torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
 
-# Install additional packages for logging experiments
-RUN pip install --no-cache-dir tqdm rich pyfiglet click
-
 # Copy the current directory contents into the container at /app
 COPY . /app
 
@@ -29,13 +26,6 @@ EXPOSE 8888
 
 # Ensure log directory exists
 RUN mkdir -p /app/logs
-
-# Make the run script executable
-RUN chmod +x /app/new_run.sh
-RUN chmod +x /app/run.sh
-
-# # Run the script
-# ENTRYPOINT ["/app/new_run.sh"]
 
 # Run the Python script
 CMD ["python", "-u", "train.py"]
