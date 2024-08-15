@@ -20,11 +20,19 @@ def run_diagnostics(cfg):
     # Get data loaders
     train_loader, _, _ = get_data_loaders(cfg)
 
+    def print_model_config(model_cfg):
+        for key, value in model_cfg.items():
+            print(f"  {key}: {value}")
+
     # Define model creation functions
     def create_base_model():
+        print("Creating Base Model with config:")
+        print_model_config(cfg.model)
         return BaseModel(cfg).to(device)
 
     def create_experiment_model():
+        print("Creating Experiment Model with config:")
+        print_model_config(cfg.model)
         return ExperimentModel(cfg).to(device)
 
     # Run diagnostics for base model
