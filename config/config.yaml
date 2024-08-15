@@ -18,12 +18,12 @@ training:
 
 # config/experiment/base.yaml
 model:
-  _target_: models.BaseModel
+  type: models.BaseModel
   hidden_size: 128
   dropout: 0.0
 
 # config/experiment/experiment.yaml
 model:
-  _target_: models.ExperimentModel
+  type: models.ExperimentModel
   hidden_size: 256
   dropout: 0.5
