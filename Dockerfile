@@ -30,5 +30,8 @@ EXPOSE 8888
 # Ensure log directory exists
 RUN mkdir -p /app/logs
 
-# Run the Python script
-CMD ["./start.sh", "train"]
+# Set the start.sh script as the entrypoint
+ENTRYPOINT ["/app/start.sh"]
+
+# Default to running training
+CMD ["train"]

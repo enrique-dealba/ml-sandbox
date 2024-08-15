@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Add the current directory to PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:/app"
+
 if [ "$1" = "train" ]; then
     python train.py
 elif [ "$1" = "diagnostics" ]; then
