@@ -7,7 +7,7 @@ class ExperimentModel(nn.Module):
         self.fc1 = nn.Linear(28 * 28, config.model.hidden_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(config.model.dropout)
-        self.fc2 = nn.Linear(config.model.hidden_size, 10)
+        self.fc2 = nn.Linear(config.model.hidden_size, config.data.num_classes)
 
     def forward(self, x):
         x = self.flatten(x)
