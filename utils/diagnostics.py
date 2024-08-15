@@ -17,9 +17,7 @@ def run_diagnostics(cfg):
         return BaseModel(cfg).to(device)
 
     def create_experiment_model():
-        experiment_cfg = OmegaConf.load("config/experiment/experiment.yaml")
-        merged_cfg = OmegaConf.merge(cfg, experiment_cfg)
-        return ExperimentModel(merged_cfg).to(device)
+        return ExperimentModel(cfg).to(device)
 
     # Run diagnostics for base model
     print("Running diagnostics for Base Model:")
