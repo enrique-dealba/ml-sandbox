@@ -18,6 +18,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip uninstall torch -y
 RUN pip install --no-cache-dir torch==2.1.2 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
 
+# Uninstall any existing NumPy version
+RUN pip uninstall -y numpy
+
+# Install NumPy 1.24.3 explicitly
+RUN pip install numpy==1.24.3
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 
