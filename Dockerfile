@@ -28,4 +28,4 @@ EXPOSE 8888
 RUN mkdir -p /app/logs
 
 # Run the Python script
-CMD ["python", "-u", "train.py"]
+CMD ["./start.sh", "train"]
