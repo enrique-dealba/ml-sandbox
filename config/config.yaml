@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - experiment: base  # Defaults to base experiment
+  - experiment: base  # Default to base experiment
   - override hydra/launcher: joblib
 
 data:
@@ -17,13 +17,11 @@ training:
   patience: 5
 
 # config/experiment/base.yaml
-model:
-  type: base
-  hidden_size: 128
-  dropout: 0.0
+_target_: models.BaseModel
+hidden_size: 128
+dropout: 0.0
 
 # config/experiment/experiment.yaml
-model:
-  type: experiment
-  hidden_size: 256
-  dropout: 0.5
+_target_: models.ExperimentModel
+hidden_size: 256
+dropout: 0.5

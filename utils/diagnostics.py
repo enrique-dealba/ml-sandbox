@@ -53,7 +53,7 @@
 import neural_net_checklist.torch_diagnostics as torch_diagnostics
 import torch
 from omegaconf import OmegaConf
-from models import BaseModel, ExperimentModel
+from hydra.utils import instantiate
 from utils.data_loader import get_data_loaders
 
 def run_diagnostics(cfg):
@@ -73,20 +73,16 @@ def run_diagnostics(cfg):
         for key, value in model_cfg.items():
             print(f"  {key}: {value}")
 
-    def create_model(model_type):
-        print(f"Creating {model_type.capitalize()} Model with config:")
-        print_model_config(cfg.model)
-        if model_type == 'base':
-            return BaseModel(cfg).to(device)
-        elif model_type == 'experiment':
-            return ExperimentModel(cfg).to(device)
-        else:
-            raise ValueError(f"Unknown model type: {model_type}")
+    def create_model():
+        print(f"Creating model with config:")
+        print_model_config(cfg.experiment)
+        model = instantiate(cfg.experiment)
+        return model.to(device)
 
     # Run diagnostics for the specified model
-    print(f"Running diagnostics for {cfg.model.type.capitalize()} Model:")
+    print(f"Running diagnostics for {cfg.experiment._target_.split('.')[-1]}:")
     torch_diagnostics.assert_all_for_classification_cross_entropy_loss(
-        lambda: create_model(cfg.model.type),
+        create_model,
         train_loader,
         device=device,
         num_classes=cfg.data.num_classes
