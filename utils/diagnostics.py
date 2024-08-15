@@ -1,5 +1,6 @@
 import neural_net_checklist.torch_diagnostics as torch_diagnostics
 import torch
+from omegaconf import OmegaConf
 
 from models import BaseModel, ExperimentModel
 from utils.data_loader import get_data_loaders
@@ -16,7 +17,9 @@ def run_diagnostics(cfg):
         return BaseModel(cfg).to(device)
 
     def create_experiment_model():
-        return ExperimentModel(cfg).to(device)
+        experiment_cfg = OmegaConf.load("config/experiment/experiment.yaml")
+        merged_cfg = OmegaConf.merge(cfg, experiment_cfg)
+        return ExperimentModel(merged_cfg).to(device)
 
     # Run diagnostics for base model
     print("Running diagnostics for Base Model:")
