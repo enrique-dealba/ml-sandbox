@@ -21,6 +21,9 @@ RUN pip install --no-cache-dir torch==2.1.2 torchvision==0.16.2 --index-url http
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Make start.sh executable
+RUN chmod +x /app/start.sh
+
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
