@@ -9,6 +9,14 @@ from utils.data_loader import get_data_loaders
 def run_diagnostics(cfg):
     device = torch.device(cfg.training.device if torch.cuda.is_available() else "cpu")
 
+    print(f"Using device: {device}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    if torch.cuda.is_available():
+        print(f"Current CUDA device: {torch.cuda.current_device()}")
+        print(f"CUDA device name: {torch.cuda.get_device_name(device)}")
+        print(f"CUDA device count: {torch.cuda.device_count()}")
+        print(f"CUDA version: {torch.version.cuda}")
+
     # Get data loaders
     train_loader, _, _ = get_data_loaders(cfg)
 
