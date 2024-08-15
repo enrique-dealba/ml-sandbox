@@ -4,7 +4,7 @@ from omegaconf import DictConfig
 from utils.diagnostics import run_diagnostics
 
 
-@hydra.main(config_path="../config", config_name="config")
+@hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
     run_diagnostics(cfg)
 

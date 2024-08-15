@@ -1,6 +1,7 @@
 defaults:
   - _self_
-  - experiment: base
+  - experiment: base  # Defaults to base experiment
+  - override hydra/launcher: joblib
 
 data:
   dataset: mnist
@@ -15,7 +16,14 @@ training:
   device: cuda
   patience: 5
 
+# config/experiment/base.yaml
 model:
   type: base
   hidden_size: 128
   dropout: 0.0
+
+# config/experiment/experiment.yaml
+model:
+  type: experiment
+  hidden_size: 256
+  dropout: 0.5
