@@ -71,16 +71,18 @@ def run_diagnostics(cfg):
 
     def print_model_config(model_cfg):
         for key, value in model_cfg.items():
-            print(f"  {key}: {value}")
+            if key != '_target_':
+                print(f"  {key}: {value}")
 
     def create_model():
         print(f"Creating model with config:")
-        print_model_config(cfg.experiment)
-        model = instantiate(cfg.experiment)
+        print_model_config(cfg.experiment.model)
+        model = instantiate(cfg.experiment.model)
         return model.to(device)
 
     # Run diagnostics for the specified model
-    print(f"Running diagnostics for {cfg.experiment._target_.split('.')[-1]}:")
+    model_name = cfg.experiment.model._target_.split('.')[-1]
+    print(f"Running diagnostics for {model_name}:")
     torch_diagnostics.assert_all_for_classification_cross_entropy_loss(
         create_model,
         train_loader,
